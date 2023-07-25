@@ -3,7 +3,7 @@ from datetime import datetime
 from pprint import pprint
 from core import __version__
 from core import explore_file, explore_url, delete_all_urls, delete_all_files
-from scripts import printPretty, printHistory, printLAR
+from scripts import printPretty, print_history_vt, print_LAR_vt, printTable
 
 
 @click.version_option(
@@ -11,7 +11,7 @@ from scripts import printPretty, printHistory, printLAR
     # message="%(prog)s, version %(version)s"
 )
 @click.group()
-def cli(max_content_width=120):   
+def cli(max_content_width=120):
     """
     ----------------------------------------------------------------------------
     -------------|--------------------------------#####-------------------------
@@ -33,7 +33,7 @@ def cli(max_content_width=120):
     Keyword arguments:
     argument -- description
     Return: return_description
-    """             
+    """
     pass
 
 # *************************************************************************************************************
@@ -65,16 +65,20 @@ def expl_file(ctx, path, hash_alg, engine, anls_antv, history, verbose, update, 
     if not path:
         ctx.fail("The file path is required")
     else:
-        data = explore_file(path, hash_alg, engine, update=update)
+        data, status = explore_file(path, hash_alg, engine, update=update)
+        print(f'\n{status}\n')
 
         if engine == 'vt' and anls_antv:
-            printLAR(data)
+            print_LAR_vt(data)
         elif engine == 'vt' and history:
-            printHistory(data)
+            print_history_vt(data)
+        elif verbose:
+            printTable(data)
         else:
             printPretty(data)
 
 # *************************************************************************************************************
+
 
 @cli.command(help="Explore Url: Comand to get report about a url of website known")
 @click.option('-u', '--url', required=True, type=str, help="URL for the web")
@@ -83,28 +87,32 @@ def expl_file(ctx, path, hash_alg, engine, anls_antv, history, verbose, update, 
               help="Engine for de scan or search",
               type=click.Choice(['vt', 'kp']),
               default='vt',
-              show_default=True              
+              show_default=True
               )
 @click.option('-a', '--anls-antv', is_flag=True, help="Aanalisis de los Anitvirus")
 @click.option('-H', '--history', is_flag=True, help="Aanalisis de los Anitvirus")
-@click.option('--verbose', is_flag=True, help="Resumir lo mas Importante")
+@click.option('-v', '--verbose', is_flag=True, help="Resumir lo mas Importante")
 @click.option('-U', '--update', is_flag=True, help="Actualizar el Ultimo Escaneo, no utilzarlo si no ha escaneado previamente")
 def expl_url(url, engine, anls_antv, history, verbose, update):
-    
+
     data, status = explore_url(url=url, engine=engine, update=update)
-    print(f'\n{status}')
+    print(f'\n{status}\n')
 
     if engine == 'vt' and anls_antv:
-        printLAR(data)
+        print_LAR_vt(data)
     elif engine == 'vt' and history:
-        printHistory(data)
+        print_history_vt(data)
+    elif verbose:
+        printTable(data)
     else:
+        # printTable(data)
         printPretty(data)
 
 # *************************************************************************************************************
 
+
 @cli.command(help="Eliminar la base de datos local de los files.")
-@click.option('--confirm', prompt='Desea eliminar TODOS los files registrados', type=click.Choice(['y','n']))
+@click.option('--confirm', prompt='Desea eliminar TODOS los files registrados', type=click.Choice(['y', 'n']))
 def delreg_files(confirm):
     if confirm == 'y':
         status = delete_all_files()
@@ -112,8 +120,9 @@ def delreg_files(confirm):
     else:
         print('\nABORTADO\n')
 
+
 @cli.command(help="Eliminar la base de datos local de las urls.")
-@click.option('--confirm', prompt='Desea eliminar TODAS las urls registradas', type=click.Choice(['y','n']))
+@click.option('--confirm', prompt='Desea eliminar TODAS las urls registradas', type=click.Choice(['y', 'n']))
 def delreg_urls(confirm):
     if confirm == 'y':
         status = delete_all_urls()

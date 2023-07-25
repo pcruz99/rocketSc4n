@@ -24,12 +24,13 @@ def filter_data(data, atrs):
                 lar = []
                 for k in data['last_analysis_results'].keys():
                     category = data['last_analysis_results'][k]['category']
-                    if category == 'malicious' or category == 'suspicious':
+                    if category != 'undetected':
                         lar.append({k: data['last_analysis_results'][k]})
                 res['last_analysis_results'] = lar
                 continue
             res[key] = value
     return res
+
 
 def get_file_report(hash: str):
     client = open_conn()
@@ -42,7 +43,7 @@ def get_file_report(hash: str):
         if (e.args[0] == 'NotFoundError'):
             res = {"status": "error",
                    "msg": "Documento no Econtrado en VirusTotal",
-                   "exeption": e.args}
+                   "exeption": e.args, "data": {}}
     except KeyError as ke:
         print(ke.args)
     finally:
@@ -62,7 +63,7 @@ def get_url_report(url: str):
         if (e.args[0] == 'NotFoundError'):
             res = {"status": "error",
                    "msg": "URI no Econtrado en VirusTotal",
-                   "exeption": e.args}
+                   "exeption": e.args, "data": {}}
     finally:
         close_conn(client)
         return res

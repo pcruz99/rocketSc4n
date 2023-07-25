@@ -13,12 +13,6 @@ load_dotenv()
 
 API_KEY = os.getenv('KASPERSKY_API_KEY')
 
-
-# hash1 = "25c77d35b685b78017ed7830873e065a"
-# url1 = "http://cioco-froll.com/"
-# url1 = "https://cuevana.biz/inicio"
-
-
 def filter_data_4_file(data, atrs):
     """
     atrs -- FileGeneralInfo
@@ -69,10 +63,10 @@ def looking_hash_file(hash: str):
             res = {"status": "ok", "data": data}
         else:
             res = {"status": "error",
-                   "msg": "Documento no encontrado en Kaspersky"}
+                   "msg": "Documento no encontrado en Kaspersky", "data": {}}
     except HTTPError as e:
         res = {"status": "error",
-               "msg": "No hay respuesta del servidor"}
+               "msg": "No hay respuesta del servidor", "data": {}}
     finally:
         return res
 
@@ -90,9 +84,9 @@ def looking_web_address(url: str):
             res = {"status": "ok", "data": data}
         else:
             res = {"status": "error",
-                   "msg": "URI no encontrado en Kaspersky"}
+                   "msg": "URI no encontrado en Kaspersky", "data": {}}
     except HTTPError as e:
         res = {"status": "error",
-               "msg": "No hay respuesta del servidor"}
+               "msg": "No hay respuesta del servidor", "data": {}}
     finally:
         return res
